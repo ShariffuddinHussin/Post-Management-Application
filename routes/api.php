@@ -17,5 +17,5 @@ use Illuminate\Support\Facades\Route;
 Route::post('login', 'AuthController@login');
 Route::post('register', 'AuthController@register');
 Route::middleware('auth:api')->group(function () {
-    Route::resource('products', 'PostController');
+    Route::resource('posts', 'PostController');
 });
