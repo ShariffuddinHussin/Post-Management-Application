@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -38,9 +39,20 @@ class AuthController extends Controller
 
         if (auth()->attempt($credentials)) {
             $token = auth()->user()->createToken('post')->accessToken;
-            return response()->json(['success' => 'Authorised'], 200);
+            return response()->json([
+                'success' => 'Authorised',
+                'token' => $token
+            ], 200);
         } else {
-            return response()->json(['error' => 'login error'], 401);
+            $user = User::where('email', '=', $request->email)->first();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Login Fail, please check email']);
+            }
+            if (!Hash::check($request->password, $user->password)) {
+                return response()->json(['success' => false, 'message' => 'Login Fail, please check password']);
+            }
+            // dd(Hash::make($request->password));
+
         }
     }
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Post;
 
-class PostCOntroller extends Controller
+class PostController extends Controller
 {
     public function index()
     {
@@ -20,17 +20,20 @@ class PostCOntroller extends Controller
     public function show($id)
     {
         $post = auth()->user()->posts()->find($id);
-        if ($post) {
+
+        if (!$post) {
             return response()->json([
                 'success' => false,
-                'data' => 'Post not found'
+                'message' => 'Post not found '
             ], 400);
         }
+
         return response()->json([
             'success' => true,
             'data' => $post->toArray()
         ], 400);
     }
+
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -42,22 +45,23 @@ class PostCOntroller extends Controller
         $post->title = $request->title;
         $post->description = $request->description;
 
-        if (auth()->user()->posts()->save($post)) {
+        if (auth()->user()->posts()->save($post))
             return response()->json([
                 'success' => true,
                 'data' => $post->toArray()
             ]);
-        } else {
+        else
             return response()->json([
                 'success' => false,
-                'message' => 'Post can not be updated'
+                'message' => 'Post not added'
             ], 500);
-        }
     }
-    public function update(Request $request)
+
+    public function update(Request $request, $id)
     {
         $post = auth()->user()->posts()->find($id);
-        if ($post) {
+
+        if (!$post) {
             return response()->json([
                 'success' => false,
                 'message' => 'Post not found'
@@ -65,17 +69,18 @@ class PostCOntroller extends Controller
         }
 
         $updated = $post->fill($request->all())->save();
-        if ($updated) {
+
+        if ($updated)
             return response()->json([
-                'success' => true,
+                'success' => true
             ]);
-        } else {
+        else
             return response()->json([
                 'success' => false,
                 'message' => 'Post can not be updated'
             ], 500);
-        }
     }
+
     public function destroy($id)
     {
         $post = auth()->user()->posts()->find($id);
