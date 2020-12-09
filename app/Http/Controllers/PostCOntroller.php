@@ -11,7 +11,7 @@ class PostController extends Controller
     {
         $posts = auth()->user()->posts;
 
-        return response()->json([
+        return response([
             'success' => true,
             'data' => $posts
         ]);
@@ -31,7 +31,7 @@ class PostController extends Controller
         return response()->json([
             'success' => true,
             'data' => $post->toArray()
-        ], 400);
+        ]);
     }
 
     public function store(Request $request)
@@ -61,6 +61,11 @@ class PostController extends Controller
     {
         $post = auth()->user()->posts()->find($id);
 
+        $this->validate($request, [
+            'title' => 'required',
+            'description' => 'required'
+        ]);
+
         if (!$post) {
             return response()->json([
                 'success' => false,
@@ -84,7 +89,6 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = auth()->user()->posts()->find($id);
-
         if (!$post) {
             return response()->json([
                 'success' => false,
